@@ -14,14 +14,22 @@ export default class Store {
   }
 
   @action.bound
-  public toggleQuestion(id: number) {
+  public selectQuestion(id: number) {
+    const index = this.internalSelectedQuestions.indexOf(id);
+    if (index !== -1) {
+      return;
+    }
+
+    this.internalSelectedQuestions.push(id);
+  }
+
+  @action.bound
+  public unselectQuestion(id: number) {
     const index = this.internalSelectedQuestions.indexOf(id);
     if (index !== -1) {
       this.internalSelectedQuestions.splice(index, 1);
       return;
     }
-
-    this.internalSelectedQuestions.push(id);
   }
 
   public isSelected(id: number) {

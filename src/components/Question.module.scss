@@ -45,16 +45,6 @@
           color: black;
         }
       }
-      &.memo {
-        button {
-          border-color: green;
-          color: green;
-          &.selected {
-            color: white;
-            background: green;
-          }
-        }
-      }
       &.test {
         a {
           background: #6fb0e8;

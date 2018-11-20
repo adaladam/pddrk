@@ -47,9 +47,6 @@ export default class Question extends React.Component<IQuestionProps & { store?:
           <div className={styles.answer}>
             {this.answerEl()}
           </div>
-          <div className={styles.memo}>
-            {this.memoEl(isSelected)}
-          </div>
           <div className={styles.test}>
             {this.testEl(hasSelected)}
           </div>
@@ -91,30 +88,23 @@ export default class Question extends React.Component<IQuestionProps & { store?:
       : <span>Правильный ответ: {variants[this.props.correctAnswer - 1]}</span>;
   }
 
-  private memoEl(isSelected: boolean) {
-    return !this.props.testMode
-      ? (
-        <button
-          className={isSelected ? styles.selected : ''}
-          onClick={() => this.props.store!.toggleQuestion(this.props.id)}>
-          Запомнила!
-        </button>
-      )
-      : null;
-  }
-
   private testEl(hasSelected: boolean) {
     if (this.props.testMode) {
       return <Link to="/questions">Назад к вопросам</Link>;
     }
 
     return hasSelected
-      ? <Link to="/test">Начать тест</Link>
+      ? <Link to="/test">Работа над ошибками</Link>
       : null;
   }
 
   private onAnswerChosen(index: number) {
     this.setState({ chosenAnswer: index });
+    if (this.props.correctAnswer - 1 !== index) {
+      this.props.store!.selectQuestion(this.props.id);
+    } else if (this.props.testMode) {
+      setTimeout(() => this.props.store!.unselectQuestion(this.props.id), 3000);
+    }
   }
 
   private answerStatus(index: number): 'correct' | 'incorrect' | null {
