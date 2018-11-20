@@ -14,8 +14,10 @@ export default class Store {
   }
 
   @action.bound
-  public selectQuestion(id: number) {
-    if (this.internalSelectedQuestions.indexOf(id) !== -1) {
+  public toggleQuestion(id: number) {
+    const index = this.internalSelectedQuestions.indexOf(id);
+    if (index !== -1) {
+      this.internalSelectedQuestions.splice(index, 1);
       return;
     }
 

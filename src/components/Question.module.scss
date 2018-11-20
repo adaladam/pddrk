@@ -33,6 +33,11 @@
         outline: none;
       }
     }
+    a {
+      display: inline-block;
+      font-size: 12px;
+      text-decoration: none;
+    }
     div {
       display: inline-block;
       &.answer {
@@ -53,8 +58,11 @@
       &.test {
         a {
           background: #6fb0e8;
-          font-size: 12px;
-          text-decoration: none;
+        }
+      }
+      &.back {
+        a {
+          background: #e8e46f;
         }
       }
     }

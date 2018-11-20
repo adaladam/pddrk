@@ -51,7 +51,10 @@ export default class Question extends React.Component<IQuestionProps & { store?:
             {this.memoEl(isSelected)}
           </div>
           <div className={styles.test}>
-            {this.linkEl(hasSelected)}
+            {this.testEl(hasSelected)}
+          </div>
+          <div className={styles.back}>
+            <Link to="/groups">Назад к выбору группы</Link>
           </div>
         </div>
       </div>
@@ -93,14 +96,14 @@ export default class Question extends React.Component<IQuestionProps & { store?:
       ? (
         <button
           className={isSelected ? styles.selected : ''}
-          onClick={() => this.props.store!.selectQuestion(this.props.id)}>
+          onClick={() => this.props.store!.toggleQuestion(this.props.id)}>
           Запомнила!
         </button>
       )
       : null;
   }
 
-  private linkEl(hasSelected: boolean) {
+  private testEl(hasSelected: boolean) {
     if (this.props.testMode) {
       return <Link to="/questions">Назад к вопросам</Link>;
     }
