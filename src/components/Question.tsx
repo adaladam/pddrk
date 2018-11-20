@@ -18,6 +18,7 @@ interface IQuestionProps {
 interface IQuestionState {
   readonly answerHidden: boolean;
   readonly imageLoaded: boolean;
+  readonly chosenAnswer?: number;
 }
 
 const variants = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'H', 'J', 'K'];
@@ -40,7 +41,7 @@ export default class Question extends React.Component<IQuestionProps & { store?:
         />
         <p>{this.props.id}. {this.props.question}</p>
         <ul>
-          {this.props.answers.map((answer, i) => <li key={i}>{variants[i]}. {answer}</li>)}
+          {this.answersEl()}
         </ul>
         <div className={styles.buttons}>
           <div className={styles.answer}>
@@ -54,6 +55,30 @@ export default class Question extends React.Component<IQuestionProps & { store?:
           </div>
         </div>
       </div>
+    );
+  }
+
+  private answersEl() {
+    if (this.state.chosenAnswer != null) {
+      return this.props.answers.map((answer, i) => {
+        let className = '';
+        const status = this.answerStatus(i);
+        if (status === 'correct') {
+          className = styles.correct;
+        } else if (status === 'incorrect') {
+          className = styles.incorrect;
+        } else if (i === this.props.correctAnswer - 1) {
+          className = styles.correct;
+        }
+
+        return <li key={i} className={className}>{variants[i]}. {answer}</li>;
+      });
+    }
+
+    return this.props.answers.map(
+      (answer, i) => (
+        <li key={i} onClick={() => this.onAnswerChosen(i)}>{variants[i]}. {answer}</li>
+      ),
     );
   }
 
@@ -83,5 +108,21 @@ export default class Question extends React.Component<IQuestionProps & { store?:
     return hasSelected
       ? <Link to="/test">Начать тест</Link>
       : null;
+  }
+
+  private onAnswerChosen(index: number) {
+    this.setState({ chosenAnswer: index });
+  }
+
+  private answerStatus(index: number): 'correct' | 'incorrect' | null {
+    if (this.state.chosenAnswer !== index) {
+      return null;
+    }
+
+    if (this.props.correctAnswer - 1 === this.state.chosenAnswer) {
+      return 'correct';
+    }
+
+    return 'incorrect';
   }
 }

@@ -12,20 +12,29 @@
   }
   ul {
     list-style: none;
-  }
-  button {
-    margin: 0 10px;
-    background: none;
-    border: 1px solid black;
-    border-radius: 3px;
-    padding: 10px;
-    &:focus {
-      outline: none;
+    li {
+      &.correct {
+        color: green;
+      }
+      &.incorrect {
+        color: red;
+      }
     }
   }
   .buttons {
+    button,
+    a {
+      margin: 5px 10px;
+      background: none;
+      border: 1px solid black;
+      border-radius: 3px;
+      padding: 10px;
+      &:focus {
+        outline: none;
+      }
+    }
     div {
-      display: inline;
+      display: inline-block;
       &.answer {
         button {
           color: black;
@@ -42,7 +51,11 @@
         }
       }
       &.test {
-        display: inline;
+        a {
+          background: #6fb0e8;
+          font-size: 12px;
+          text-decoration: none;
+        }
       }
     }
   }
