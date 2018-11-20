@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "experimentalDecorators": true,
     "jsx": "preserve",
     "typeRoots": [
       "typings"
@@ -11,6 +12,12 @@
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "es2015",
+      "scripthost"
+    ],
     "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
