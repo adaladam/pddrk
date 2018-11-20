@@ -1,8 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { BrowserRouter } from 'react-router-dom';
 
 import { Provider } from 'mobx-react';
+import { BrowserRouter } from 'react-router-dom';
 
 import './index.css';
 
