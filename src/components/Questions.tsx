@@ -4,22 +4,30 @@ import { parse } from 'qs';
 import InfiniteScroll from 'react-infinite-scroller';
 import { RouteProps } from 'react-router';
 
+import { asyncComponent } from './asyncLoad';
 import Question from './Question';
-import questions from './questions.json';
 import styles from './Questions.module.scss';
 
+interface IQuestion {
+  readonly id: number;
+  readonly question: string;
+  readonly picture: string;
+  readonly answers: ReadonlyArray<string>;
+  readonly correctAnswer: number;
+}
+
+interface IQuestionProps {
+  readonly something: {
+    readonly default: ReadonlyArray<IQuestion>;
+  };
+}
+
 interface IQuestionsState {
-  readonly questions: Array<{
-    readonly id: number;
-    readonly question: string;
-    readonly picture: string;
-    readonly answers: ReadonlyArray<string>;
-    readonly correctAnswer: number;
-  }>;
+  readonly questions: IQuestion[];
   readonly hasMore: boolean;
 }
 
-export default class Questions extends React.Component<RouteProps> {
+class Questions extends React.Component<IQuestionProps & RouteProps> {
   public state: IQuestionsState = { questions: [], hasMore: true };
 
   private readonly pageSize: number = 20;
@@ -56,6 +64,8 @@ export default class Questions extends React.Component<RouteProps> {
   }
 
   private getGroupQuestions() {
+    const questions = this.props.something.default;
+
     let group = 1;
     if (this.props.location != null) {
       const { search } = this.props.location;
@@ -70,3 +80,5 @@ export default class Questions extends React.Component<RouteProps> {
       : questions.slice((group - 1) * groupSize, group * groupSize);
   }
 }
+
+export default asyncComponent(() => import('./questions.json'), Questions);

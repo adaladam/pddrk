@@ -1,34 +1,49 @@
 import * as React from 'react';
 
+interface IHasDefault {
+  readonly default: any;
+}
+
 interface IAsyncComponentState {
-  readonly component: React.ComponentType | null;
+  readonly something: IHasDefault | null;
 }
 
 interface IAsyncLoadedComponent {
   readonly default: React.ComponentType<any>;
 }
 
-export default function asyncLoad(importComponent: () => Promise<IAsyncLoadedComponent>) {
-  class AsyncComponent extends React.Component<React.Props<any>, IAsyncComponentState> {
+export function asyncComponent(importSomething: () => Promise<IHasDefault>, component?: React.ComponentClass<any>) {
+  return class AsyncComponent extends React.Component<React.Props<any>, IAsyncComponentState> {
     constructor(props: React.Props<any>) {
       super(props);
       this.state = {
-        component: null,
+        something: null,
       };
     }
 
     public async componentDidMount() {
-      const { default: component } = await importComponent();
+      const something = await importSomething();
       this.setState({
-        component,
+        something,
       });
     }
 
     public render() {
-      const C = this.state.component;
-      return C ? <C {...this.props} /> : <div>Загрузка ...</div>;
-    }
-  }
+      if (this.state.something == null) {
+        return <div>Загрузка ...</div>;
+      }
 
-  return AsyncComponent;
+      if (component != null) {
+        const Component = component;
+        return <Component {...this.props} something={this.state.something} />;
+      }
+
+      const C = this.state.something.default;
+      return <C {...this.props} />;
+    }
+  };
+}
+
+export default function asyncLoad(importComponent: () => Promise<IAsyncLoadedComponent>) {
+  return asyncComponent(importComponent);
 }
