@@ -25,7 +25,8 @@ for (const question of questions) {
     .filter(w => w)
     .map(w => symbols.indexOf(w[0]) > -1 ? w[1] : w[0])
     .filter(w => symbols.indexOf(w) === -1)
-    .join('');
+    .join('')
+    .toLowerCase();
 
   if (index[wfl] == null) {
     index[wfl] = [];
@@ -41,7 +42,11 @@ export function search(wfl: string): IIndexValue[] {
   let result: IIndexValue[] = [];
 
   const prefixes = tree.getPrefix(wfl);
-  for (const prefix of prefixes) {
+  if (prefixes.length === 0) {
+    return [];
+  }
+
+  for (const prefix of prefixes.map((p: string) => p.toLowerCase())) {
     result = [...result, ...index[prefix]];
   }
 
