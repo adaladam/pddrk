@@ -17,7 +17,9 @@
   "scripts": {
     "lint": "tslint \"src/**/*.ts\" \"src/**/*.tsx\"",
     "start": "yarn run lint && react-scripts start",
-    "build": "react-scripts build",
+    "prepare": "rm -f build.zip",
+    "build": "react-scripts build && gzip -k build/static/js/*.js",
+    "zip": "zip -r build.zip build/",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
