@@ -20,6 +20,7 @@ export default class Groups extends React.Component<{ store?: Store }> {
           <li><Link to={{ pathname: '/questions', search: '?group=5' }}>Вопросы 801 - 1019</Link></li>
           {this.testLink()}
           {this.currentQuestionLink()}
+          <li><Link to="/search">Поиск</Link></li>
         </ul>
       </div>
     );

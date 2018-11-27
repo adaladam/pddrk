@@ -14,6 +14,7 @@ export default class App extends React.Component {
             <Route path="/" exact render={() => <Redirect to="/groups" />}></Route>
             <Route path="/groups" exact component={asyncLoad(() => import('./components/Groups'))} />
             <Route path="/questions" exact component={asyncLoad(() => import('./components/Questions'))} />
+            <Route path="/search" exact component={asyncLoad(() => import('./components/Search'))} />
             <Route path="/test" exact component={asyncLoad(() => import('./components/Test'))} />
             <Route render={() => <div>NOT FOUND</div>} />
           </Switch>

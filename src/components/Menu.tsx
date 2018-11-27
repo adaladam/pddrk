@@ -29,6 +29,8 @@ export default class Menu extends React.Component<IMenuProps & { store?: Store }
       elements.push(backToQuestionsEl);
     }
 
+    elements.push(<Link key="search" to="/search">Поиск</Link>);
+
     return (
       <nav className={styles.main}>
         {elements}
