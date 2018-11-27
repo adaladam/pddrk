@@ -13,11 +13,21 @@
   ul {
     list-style: none;
     li {
+      span {
+        color: blue;
+        text-decoration: underline;
+      }
       &.correct {
         color: green;
+        span {
+          color: green;
+        }
       }
       &.incorrect {
         color: red;
+        span {
+          color: red;
+        }
       }
     }
   }
@@ -43,16 +53,6 @@
       &.answer {
         button {
           color: black;
-        }
-      }
-      &.test {
-        a {
-          background: #6fb0e8;
-        }
-      }
-      &.back {
-        a {
-          background: #e8e46f;
         }
       }
     }

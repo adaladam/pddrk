@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { inject, observer } from 'mobx-react';
-import { Link } from 'react-router-dom';
 
 import Store from '../mobx/store';
 import styles from './Question.module.scss';
@@ -13,6 +12,7 @@ interface IQuestionProps {
   readonly answers: ReadonlyArray<string>;
   readonly correctAnswer: number;
   readonly testMode?: boolean;
+  readonly scrollTo?: number;
 }
 
 interface IQuestionState {
@@ -27,13 +27,23 @@ const variants = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'H', 'J', 'K'];
 @observer
 export default class Question extends React.Component<IQuestionProps & { store?: Store }, IQuestionState> {
   public state: IQuestionState = { answerHidden: true, imageLoaded: false };
+  private scrolled: boolean = false;
+
+  public componentDidUpdate() {
+    if (!this.state.imageLoaded || this.props.scrollTo !== this.props.id || this.scrolled) {
+      return;
+    }
+
+    const el = document.querySelector(`#q${this.props.id}`);
+    if (el != null) {
+      setTimeout(() => el.scrollIntoView({ behavior: 'smooth' }), 200);
+      this.scrolled = true;
+    }
+  }
 
   public render() {
-    const hasSelected = this.props.store!.hasSelected;
-    const isSelected = this.props.store!.isSelected(this.props.id);
-
     return (
-      <div className={styles.main}>
+      <div id={`q${this.props.id}`} className={styles.main}>
         <img
           src={`/pictures/${this.props.picture}`}
           style={{ display: this.state.imageLoaded ? 'block' : 'none' }}
@@ -46,12 +56,6 @@ export default class Question extends React.Component<IQuestionProps & { store?:
         <div className={styles.buttons}>
           <div className={styles.answer}>
             {this.answerEl()}
-          </div>
-          <div className={styles.test}>
-            {this.testEl(hasSelected)}
-          </div>
-          <div className={styles.back}>
-            <Link to="/groups">Назад к выбору группы</Link>
           </div>
         </div>
       </div>
@@ -71,13 +75,13 @@ export default class Question extends React.Component<IQuestionProps & { store?:
           className = styles.correct;
         }
 
-        return <li key={i} className={className}>{variants[i]}. {answer}</li>;
+        return <li key={i} className={className}><span>{variants[i]}.</span> {answer}</li>;
       });
     }
 
     return this.props.answers.map(
       (answer, i) => (
-        <li key={i} onClick={() => this.onAnswerChosen(i)}>{variants[i]}. {answer}</li>
+        <li key={i} onClick={() => this.onAnswerChosen(i)}><span>{variants[i]}.</span> {answer}</li>
       ),
     );
   }
@@ -88,22 +92,16 @@ export default class Question extends React.Component<IQuestionProps & { store?:
       : <span>Правильный ответ: {variants[this.props.correctAnswer - 1]}</span>;
   }
 
-  private testEl(hasSelected: boolean) {
-    if (this.props.testMode) {
-      return <Link to="/questions">Назад к вопросам</Link>;
-    }
-
-    return hasSelected
-      ? <Link to="/test">Работа над ошибками</Link>
-      : null;
-  }
-
   private onAnswerChosen(index: number) {
     this.setState({ chosenAnswer: index });
+    if (!this.props.testMode) {
+      this.props.store!.questionAnswered(this.props.id);
+    }
+
     if (this.props.correctAnswer - 1 !== index) {
-      this.props.store!.selectQuestion(this.props.id);
+      this.props.store!.mistaken(this.props.id);
     } else if (this.props.testMode) {
-      setTimeout(() => this.props.store!.unselectQuestion(this.props.id), 3000);
+      setTimeout(() => this.props.store!.unmistake(this.props.id), 3000);
     }
   }
 

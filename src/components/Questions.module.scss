@@ -1,4 +1,9 @@
 .main {
+  position: relative;
+  .content {
+    position: relative;
+    top: 50px;
+  }
   width: 80%;
   margin: 0 auto;
 }

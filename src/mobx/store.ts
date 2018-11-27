@@ -1,38 +1,68 @@
-import { action, computed, observable } from 'mobx';
+import { action, autorun, computed, IReactionDisposer, observable } from 'mobx';
+
+import ApplicationService from '../firebase';
+import { IUser } from '../models';
 
 export default class Store {
-  @observable private internalSelectedQuestions: number[] = [];
+  private disposer: IReactionDisposer | null = null;
+
+  @observable private current: number | null = null;
+  @observable private mistakens: number[] = [];
 
   @computed
-  public get hasSelected() {
-    return this.internalSelectedQuestions.length > 0;
+  public get hasMistaken() {
+    return this.mistakens.length > 0;
   }
 
   @computed
-  public get selectedQuestions(): ReadonlyArray<number> {
-    return this.internalSelectedQuestions;
+  public get currentQuestion(): number | null {
+    return this.current;
+  }
+
+  @computed
+  public get mistakenQuestions(): ReadonlyArray<number> {
+    return this.mistakens;
   }
 
   @action.bound
-  public selectQuestion(id: number) {
-    const index = this.internalSelectedQuestions.indexOf(id);
+  public loadData(user: IUser) {
+    if (this.disposer != null) {
+      this.disposer();
+    }
+
+    this.current = user.current_question_id;
+    this.mistakens = [...user.mistakens];
+    this.disposer = autorun(() => {
+      const service = new ApplicationService();
+      service.updateUser({ current_question_id: this.current, mistakens: this.mistakens });
+    });
+  }
+
+  @action.bound
+  public mistaken(id: number) {
+    const index = this.mistakens.indexOf(id);
     if (index !== -1) {
       return;
     }
 
-    this.internalSelectedQuestions.push(id);
+    this.mistakens.push(id);
   }
 
   @action.bound
-  public unselectQuestion(id: number) {
-    const index = this.internalSelectedQuestions.indexOf(id);
+  public unmistake(id: number) {
+    const index = this.mistakens.indexOf(id);
     if (index !== -1) {
-      this.internalSelectedQuestions.splice(index, 1);
+      this.mistakens.splice(index, 1);
       return;
     }
   }
 
-  public isSelected(id: number) {
-    return this.internalSelectedQuestions.indexOf(id) !== -1;
+  @action.bound
+  public questionAnswered(id: number) {
+    this.current = id;
+  }
+
+  public isMistaken(id: number) {
+    return this.mistakens.indexOf(id) !== -1;
   }
 }

@@ -10,10 +10,10 @@ import App from './App';
 import Store from './mobx/store';
 
 ReactDOM.render(
-  <BrowserRouter>
-    <Provider store={new Store()}>
+  <Provider store={new Store()}>
+    <BrowserRouter>
       <App />
-    </Provider>
-  </BrowserRouter>,
+    </BrowserRouter>
+  </Provider >,
   document.getElementById('root'),
 );
