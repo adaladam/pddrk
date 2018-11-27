@@ -3,6 +3,7 @@ import React from 'react';
 import { inject, observer } from 'mobx-react';
 
 import Store from '../mobx/store';
+import { Loadable } from '../models';
 import styles from './Question.module.scss';
 
 interface IQuestionProps {
@@ -17,7 +18,7 @@ interface IQuestionProps {
 
 interface IQuestionState {
   readonly answerHidden: boolean;
-  readonly imageLoaded: boolean;
+  readonly imageLoaded: Loadable<boolean>;
   readonly chosenAnswer?: number;
 }
 
@@ -26,11 +27,11 @@ const variants = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'H', 'J', 'K'];
 @inject('store')
 @observer
 export default class Question extends React.Component<IQuestionProps & { store?: Store }, IQuestionState> {
-  public state: IQuestionState = { answerHidden: true, imageLoaded: false };
+  public state: IQuestionState = { answerHidden: true, imageLoaded: { state: 'init' } };
   private scrolled: boolean = false;
 
   public componentDidUpdate() {
-    if (!this.state.imageLoaded || this.props.scrollTo !== this.props.id || this.scrolled) {
+    if (this.state.imageLoaded.state === 'init' || this.props.scrollTo !== this.props.id || this.scrolled) {
       return;
     }
 
@@ -46,8 +47,9 @@ export default class Question extends React.Component<IQuestionProps & { store?:
       <div id={`q${this.props.id}`} className={styles.main}>
         <img
           src={`/pictures/${this.props.picture}`}
-          style={{ display: this.state.imageLoaded ? 'block' : 'none' }}
-          onLoad={() => this.setState({ imageLoaded: true })}
+          style={{ display: this.state.imageLoaded.state === 'success' ? 'block' : 'none' }}
+          onLoad={() => this.setState({ imageLoaded: { state: 'success', data: true } })}
+          onError={() => this.setState({ imageLoaded: { state: 'failure', error: new Error('Failed loading image') } })}
         />
         <p>{this.props.id}. {this.props.question}</p>
         <ul>
