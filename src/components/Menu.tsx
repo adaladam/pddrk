@@ -18,10 +18,10 @@ export default class Menu extends React.Component<IMenuProps & { store?: Store }
     const hasMistaken = this.props.store!.hasMistaken;
 
     const elements: JSX.Element[] = [];
-    elements.push(<Link key="groups" to="/groups">Назад к выбору группы</Link>);
+    elements.push(<Link key="groups" to="/groups">Главная</Link>);
 
     if (!this.props.testMode && hasMistaken) {
-      elements.push(<Link key="test" to="/test">Работа над ошибками</Link>);
+      elements.push(<Link key="test" to="/test">Ошибки</Link>);
     }
 
     const backToQuestionsEl = this.backToQuestionsEl();
@@ -48,7 +48,7 @@ export default class Menu extends React.Component<IMenuProps & { store?: Store }
       <Link
         key="question"
         to={{ pathname: '/questions', search: `?group=${group}&scrollTo=${currentQuestion}` }}>
-        Назад к вопросам
+        Назад
       </Link>
     );
   }
