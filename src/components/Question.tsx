@@ -14,6 +14,8 @@ interface IQuestionProps {
   readonly correctAnswer: number;
   readonly testMode?: boolean;
   readonly scrollTo?: number;
+  readonly hideAnswer?: boolean;
+  examHandler?(correct: boolean): void;
 }
 
 interface IQuestionState {
@@ -89,6 +91,10 @@ export default class Question extends React.Component<IQuestionProps & { store?:
   }
 
   private answerEl() {
+    if (this.props.hideAnswer) {
+      return null;
+    }
+
     return this.state.answerHidden
       ? <button onClick={() => this.setState({ answerHidden: false })}>Показать Ответ</button>
       : <span>Правильный ответ: {variants[this.props.correctAnswer - 1]}</span>;
@@ -98,6 +104,10 @@ export default class Question extends React.Component<IQuestionProps & { store?:
     this.setState({ chosenAnswer: index });
     if (!this.props.testMode) {
       this.props.store!.questionAnswered(this.props.id);
+    }
+
+    if (this.props.examHandler) {
+      this.props.examHandler(this.props.correctAnswer - 1 === index);
     }
 
     if (this.props.correctAnswer - 1 !== index) {

@@ -167,7 +167,13 @@ export default class ApplicationService {
   public async startExam(examId: string): Promise<void> {
     const db = this.db();
     const docRef = db.collection('exams').doc(examId);
-    await docRef.update({ state: 'started' });
+    await docRef.update({ state: 'started', start_date: new Date() });
+  }
+
+  public async endExam(examId: string): Promise<void> {
+    const db = this.db();
+    const docRef = db.collection('exams').doc(examId);
+    await docRef.update({ state: 'ended', end_date: new Date() });
   }
 
   public async updateExamParticipant(

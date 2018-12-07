@@ -77,6 +77,11 @@ export default class Store {
     this.exam = exam;
   }
 
+  @action.bound
+  public unsetCurrentExam(): void {
+    this.exam = null;
+  }
+
   public isMistaken(id: number) {
     return this.mistakens.indexOf(id) !== -1;
   }
