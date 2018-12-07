@@ -1,11 +1,12 @@
 import { action, autorun, computed, IReactionDisposer, observable } from 'mobx';
 
 import ApplicationService from '../firebase';
-import { IUser } from '../models';
+import { IExam, IUser } from '../models';
 
 export default class Store {
   private disposer: IReactionDisposer | null = null;
 
+  @observable private exam: IExam | null = null;
   @observable private current: number | null = null;
   @observable private mistakens: number[] = [];
 
@@ -24,6 +25,11 @@ export default class Store {
     return this.mistakens;
   }
 
+  @computed
+  public get currentExam(): IExam | null {
+    return this.exam;
+  }
+
   @action.bound
   public loadData(user: IUser) {
     if (this.disposer != null) {
@@ -34,7 +40,11 @@ export default class Store {
     this.mistakens = [...user.mistakens];
     this.disposer = autorun(() => {
       const service = new ApplicationService();
-      service.updateUser({ current_question_id: this.current, mistakens: this.mistakens });
+      service.updateUser({
+        current_question_id: this.current,
+        examId: this.exam == null ? null : this.exam.id,
+        mistakens: this.mistakens,
+      });
     });
   }
 
@@ -60,6 +70,11 @@ export default class Store {
   @action.bound
   public questionAnswered(id: number) {
     this.current = id;
+  }
+
+  @action.bound
+  public setCurrentExam(exam: IExam): void {
+    this.exam = exam;
   }
 
   public isMistaken(id: number) {

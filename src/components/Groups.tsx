@@ -21,6 +21,7 @@ export default class Groups extends React.Component<{ store?: Store }> {
           {this.testLink()}
           {this.currentQuestionLink()}
           <li><Link to="/search">Поиск</Link></li>
+          <li><Link to="/exam">Начать тестирование</Link></li>
         </ul>
       </div>
     );

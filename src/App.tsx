@@ -16,6 +16,7 @@ export default class App extends React.Component {
             <Route path="/questions" exact component={asyncLoad(() => import('./components/Questions'))} />
             <Route path="/search" exact component={asyncLoad(() => import('./components/Search'))} />
             <Route path="/test" exact component={asyncLoad(() => import('./components/Test'))} />
+            <Route path="/exam" exact component={asyncLoad(() => import('./components/Exam'))} />
             <Route render={() => <div>NOT FOUND</div>} />
           </Switch>
         </div>
