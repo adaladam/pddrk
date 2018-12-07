@@ -80,4 +80,8 @@ export default class Store {
   public isMistaken(id: number) {
     return this.mistakens.indexOf(id) !== -1;
   }
+
+  public onExamSnapshot() {
+    return (exam: IExam) => this.setCurrentExam(exam);
+  }
 }

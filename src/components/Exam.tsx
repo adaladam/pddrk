@@ -8,6 +8,7 @@ import Store from '../mobx/store';
 
 interface IExamState {
   readonly examIdNotFound: boolean;
+  readonly message?: string;
 }
 
 @inject('store')
@@ -19,6 +20,9 @@ export default class Exam extends React.Component<{ location: Location, store?: 
 
   constructor(props: any) {
     super(props);
+
+    this.onReady = this.onReady.bind(this);
+
     this.service = new ApplicationService();
   }
 
@@ -28,23 +32,27 @@ export default class Exam extends React.Component<{ location: Location, store?: 
 
     const parsed = parse(search, { ignoreQueryPrefix: true });
     if (parsed.examId != null) {
-      this.service.getExam(parsed.examId)
+      this.service.getExam(parsed.examId, store.onExamSnapshot())
         .then(exam => {
-          if (exam != null) {
-            store.setCurrentExam(exam);
-          } else {
+          if (exam != null && exam.state !== 'created') {
+            this.setState({ message: exam.state === 'started' ? 'Экзамен уже начался' : 'Экзамен закончен' });
+          } else if (exam == null) {
             this.setState({ examIdNotFound: true });
           }
         });
       return;
     }
 
-    this.service.createExam().then(exam => this.props.store!.setCurrentExam(exam));
+    this.service.createExam(store.onExamSnapshot());
   }
 
   public render() {
     if (this.state.examIdNotFound) {
       return <Redirect to="/exam" />;
+    }
+
+    if (this.state.message != null) {
+      return <div>{this.state.message}</div>;
     }
 
     const exam = this.props.store!.currentExam;
@@ -54,10 +62,52 @@ export default class Exam extends React.Component<{ location: Location, store?: 
 
     return (
       <div>
-        {this.props.location.pathname} <br />
+        {exam.state} <br />
         {exam.id} <br />
-        {exam.questions.join(', ')}
+        {`http://localhost:3000/exam?examId=${exam.id}`} <br />
+        {exam.questions.join(', ')} <br />
+        <ul>
+          {
+            exam.participants
+              .map((p, i) => (
+                <li key={p.id}>
+                  Участник {i + 1} {this.service.getUserId() === p.id ? `(Вы)` : null} {this.isReady(p.id) ? '+' : null}
+                </li>
+              ))}
+        </ul>
+        <button onClick={this.onReady}>Готов(а)</button>
       </div>
     );
+  }
+
+  private onReady(): void {
+    const store = this.props.store!;
+    if (store.currentExam == null) {
+      return;
+    }
+
+    const userId = this.service.getUserId();
+    const index = store.currentExam.participants.findIndex(p => p.id === userId);
+    if (index === -1) {
+      return;
+    }
+
+    const exam = store.currentExam;
+    const participant = exam.participants[index];
+    this.service.updateExamParticipant(store.currentExam.id, { ...participant, isReady: true });
+  }
+
+  private isReady(userId: string): boolean {
+    const store = this.props.store!;
+    if (store.currentExam == null) {
+      return false;
+    }
+
+    const participant = store.currentExam.participants.find(p => p.id === userId);
+    if (participant == null) {
+      return false;
+    }
+
+    return participant.isReady || false;
   }
 }
