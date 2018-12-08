@@ -16,6 +16,7 @@ import questions from './questions.json';
 interface IExamState {
   readonly loading: boolean;
   readonly examIdNotFound: boolean;
+  readonly showParticipantStats: boolean;
   readonly message?: string;
   readonly timeLeftSecs?: number;
 }
@@ -23,7 +24,7 @@ interface IExamState {
 @inject('store')
 @observer
 export default class Exam extends React.Component<{ location: Location, store?: Store }, IExamState> {
-  public state: IExamState = { examIdNotFound: false, loading: true };
+  public state: IExamState = { examIdNotFound: false, loading: true, showParticipantStats: false };
 
   private readonly service: ApplicationService;
   private timer: any = null;
@@ -180,7 +181,11 @@ export default class Exam extends React.Component<{ location: Location, store?: 
 
   private timeLeft() {
     const store = this.props.store!;
-    if (store.currentExam != null && store.currentExam.state === 'ended') {
+    if (store.currentExam == null) {
+      return null;
+    }
+
+    if (store.currentExam.state === 'ended') {
       return null;
     }
 
@@ -196,6 +201,9 @@ export default class Exam extends React.Component<{ location: Location, store?: 
     }
 
     let stats: JSX.Element | null = null;
+    let participantStats: JSX.Element | null = null;
+    let button: JSX.Element | null = null;
+
     const participant = this.getCurrentParticipant();
     if (participant != null && participant.stats != null) {
       stats = (
@@ -206,10 +214,41 @@ export default class Exam extends React.Component<{ location: Location, store?: 
         </p>
       );
     }
+
+    if (this.state.showParticipantStats && participant != null) {
+      participantStats = (
+        <ul>
+          {store.currentExam.participants.map((p, i) => {
+            if (p.id === participant.id) {
+              return null;
+            }
+
+            return (
+              <li key={i}>
+                Участник {i + 1} &nbsp;&nbsp;
+                <span className={styles.total}>{p.stats ? p.stats.answered : 0}</span>
+                /
+                <span className={styles.correct}>{p.stats ? p.stats.correct : 0}</span>
+              </li>);
+          })}
+        </ul>
+      );
+    }
+
+    if (store.currentExam.participants.length > 1) {
+      button = (
+        <button onClick={() => this.setState({ showParticipantStats: !this.state.showParticipantStats })}>
+          <span>{this.state.showParticipantStats ? '<<' : '>>'}</span>
+        </button>
+      );
+    }
+
     return (
-      <div className={styles['time-left']}>
+      <div className={`${styles['time-left']} ${this.state.showParticipantStats ? styles['participant-stats'] : ''}`}>
         {text}
         {stats}
+        {participantStats}
+        {button}
       </div>
     );
   }
