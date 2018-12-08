@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { inject, observer } from 'mobx-react';
 
 import Store from '../mobx/store';
+import styles from './Groups.module.scss';
 import { getGroupByCurrentQuestion } from './utils';
 
 @inject('store')
@@ -11,7 +12,8 @@ import { getGroupByCurrentQuestion } from './utils';
 export default class Groups extends React.Component<{ store?: Store }> {
   public render() {
     return (
-      <div>
+      <div className={styles.main}>
+        <h2>Подготовка к экзаменам ПДД РК</h2>
         <ul>
           <li><Link to={{ pathname: '/questions', search: '?group=1' }}>Вопросы 1 - 200</Link></li>
           <li><Link to={{ pathname: '/questions', search: '?group=2' }}>Вопросы 201 - 400</Link></li>

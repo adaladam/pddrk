@@ -1,4 +1,5 @@
 import copy from 'clipboard-copy';
+import every from 'lodash/every';
 import padStart from 'lodash/padStart';
 import { inject, observer } from 'mobx-react';
 import { parse } from 'qs';
@@ -78,7 +79,8 @@ export default class Exam extends React.Component<{ location: Location, store?: 
       this.setState({ timeLeftSecs: 40 * 60 }, this.setInterval);
     }
 
-    if (this.state.timeLeftSecs === 0 && store.currentExam.state !== 'ended') {
+    const finished = every(store.currentExam.participants, p => p.stats && p.stats.answered === 40);
+    if ((this.state.timeLeftSecs === 0 || finished) && store.currentExam.state !== 'ended') {
       clearInterval(this.timer);
       this.service.endExam(store.currentExam.id);
     }
@@ -217,21 +219,24 @@ export default class Exam extends React.Component<{ location: Location, store?: 
 
     if (this.state.showParticipantStats && participant != null) {
       participantStats = (
-        <ul>
-          {store.currentExam.participants.map((p, i) => {
-            if (p.id === participant.id) {
-              return null;
-            }
+        <React.Fragment>
+          <h3>Другие участники</h3>
+          <ul>
+            {store.currentExam.participants.map((p, i) => {
+              if (p.id === participant.id) {
+                return null;
+              }
 
-            return (
-              <li key={i}>
-                Участник {i + 1} &nbsp;&nbsp;
+              return (
+                <li key={i}>
+                  Участник {i + 1} &nbsp;&nbsp;
                 <span className={styles.total}>{p.stats ? p.stats.answered : 0}</span>
-                /
+                  /
                 <span className={styles.correct}>{p.stats ? p.stats.correct : 0}</span>
-              </li>);
-          })}
-        </ul>
+                </li>);
+            })}
+          </ul>
+        </React.Fragment>
       );
     }
 
@@ -255,7 +260,11 @@ export default class Exam extends React.Component<{ location: Location, store?: 
 
   private summary() {
     const store = this.props.store!;
-    if (store.currentExam != null && store.currentExam.state !== 'ended') {
+    if (store.currentExam == null) {
+      return null;
+    }
+
+    if (store.currentExam.state !== 'ended') {
       return null;
     }
     const participant = this.getCurrentParticipant();
@@ -272,11 +281,36 @@ export default class Exam extends React.Component<{ location: Location, store?: 
       );
     }
 
+    let participantStats: JSX.Element | null = null;
+    if (store.currentExam.participants.length > 1) {
+      participantStats = (
+        <React.Fragment>
+          <h3>Другие участники</h3>
+          <ul>
+            {store.currentExam.participants.map((p, i) => {
+              if (p.id === participant.id) {
+                return null;
+              }
+
+              return (
+                <li key={i}>
+                  Участник {i + 1} &nbsp;&nbsp;
+                <span className={styles.total}>{p.stats ? p.stats.answered : 0}</span>
+                  /
+                <span className={styles.correct}>{p.stats ? p.stats.correct : 0}</span>
+                </li>);
+            })}
+          </ul>
+        </React.Fragment>
+      );
+    }
+
     return (
       <div className={styles.summary}>
         <p><strong>Экзамен завершен!</strong></p>
         <p>Всего ответили на вопросов: {participant.stats.answered}</p>
-        <p>Из них правильно {participant.stats.correct}</p>
+        <p>Из них правильно: {participant.stats.correct}</p>
+        {participantStats}
       </div>
     );
   }

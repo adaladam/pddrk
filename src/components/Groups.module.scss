@@ -1,0 +1,25 @@
+.main {
+  max-width: 500px;
+  margin: 10px auto;
+  h2 {
+    margin: 0;
+    padding: 0;
+    text-align: center;
+  }
+  ul {
+    margin: 0 5px;
+    padding: 0;
+    list-style: none;
+    li {
+      border: 1px dotted #ddd;
+      margin: 5px 0;
+      a {
+        display: block;
+        padding: 15px 10px;
+        &:hover {
+          background: #eee;
+        }
+      }
+    }
+  }
+}
