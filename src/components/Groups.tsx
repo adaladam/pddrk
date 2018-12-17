@@ -13,7 +13,7 @@ export default class Groups extends React.Component<{ store?: Store }> {
   public render() {
     return (
       <div className={styles.main}>
-        <h2>Подготовка к экзаменам ПДД РК</h2>
+        <h2>Подготовка к экзаменам ПДД РК!!!</h2>
         <ul>
           <li><Link to={{ pathname: '/questions', search: '?group=1' }}>Вопросы 1 - 200</Link></li>
           <li><Link to={{ pathname: '/questions', search: '?group=2' }}>Вопросы 201 - 400</Link></li>
