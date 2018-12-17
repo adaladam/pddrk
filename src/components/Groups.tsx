@@ -32,7 +32,7 @@ export default class Groups extends React.Component<{ store?: Store }> {
   private testLink() {
     const hasMistaken = this.props.store!.hasMistaken;
     if (hasMistaken) {
-      return <li><Link to="/test">Работа над ошибками!</Link></li>;
+      return <li><Link to="/test">Работа над ошибками</Link></li>;
     }
 
     return null;
